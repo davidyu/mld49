@@ -102,7 +102,15 @@ end
 function cmd.execute( bot )
   if table.maxn( cmd.commandq ) > 0 and bot.state == 'idle' then
     local command = table.remove( cmd.commandq, 1 )
-    -- execute the command on the bot
+    if command == 'ml' then
+      bot.x = bot.x - 1
+    elseif command == 'mr' then
+      bot.x = bot.x + 1
+    elseif command == 'mu' then
+      bot.y = bot.y - 1
+    elseif command == 'md' then
+      bot.y = bot.y + 1
+    end
     -- debug
     print( cmd.state .. " " .. command )
   end

@@ -1,4 +1,7 @@
 
+-- vendor libs
+require 'vendor/AnAL'
+
 -- modules
 local utils = require 'utils'
 local bot = require 'bot'
@@ -21,6 +24,7 @@ end
 
 function love.update( dt )
   cmd.execute( bot )
+  bot.anim:update( dt )
 end
 
 function love.draw()
@@ -32,5 +36,5 @@ function love.draw()
   end
 
   -- draw bot
-  -- love.graphics.draw( bot.tileset, bot.frame, ( bot.x - 1 ) * map.tilewidth, ( bot.y - 1 ) * map.tileheight )
+  bot.anim:draw( ( bot.x - 1 ) * map.tilewidth, ( bot.y - 1 ) * map.tileheight )
 end
