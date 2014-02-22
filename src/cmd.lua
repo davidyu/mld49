@@ -3,8 +3,10 @@ local cmd = {}
 function cmd.init()
   cmd.commandq = {}
   cmd.records = {}
+  cmd.rkey = nil
   cmd.repeatrate = 0
   cmd.state = 'regular'
+  cmd.statestack = {}
 end
 
 function cmd.toCommand( key )
@@ -59,12 +61,23 @@ function cmd.toCommand( key )
   end
 end
 
--- helper/aux functions for cmd.process (all have side effects!)
+-- helper/aux functions for cmd.process (watch out for side-effects!)
+local function has( table, v )
+  for key, value in pairs( table ) do
+    if value == v then return true end
+  end
+  return false
+end
+
 local function playback( id )
   local record = cmd.records[ id ]
+  local recordingInBackground = has( cmd.statestack, 'record' )
   if record ~= nil then
     for _, entry in ipairs( record ) do
       table.insert( cmd.commandq, entry )
+      if recordingInBackground then
+        table.insert( cmd.records[ cmd.rkey ], entry )
+      end
     end
   end
 end
@@ -75,36 +88,36 @@ function cmd.process( command )
     if cmd.repeatrate > 0 then
       for i = 1,cmd.repeatrate do
         if cmd.state == 'record' then
-          table.insert( cmd.records[ cmd.rpid ], command )
+          table.insert( cmd.records[ cmd.rkey ], command )
         end
         table.insert( cmd.commandq, command )
       end
       cmd.repeatrate = 0
     else
       if cmd.state == 'record' then
-        table.insert( cmd.records[ cmd.rpid ], command )
+        table.insert( cmd.records[ cmd.rkey ], command )
       end
       table.insert( cmd.commandq, command )
     end
   elseif command == 'rec' then -- starts and ends record phase
-    if cmd.state == 'regular' then
+    if cmd.state == 'record' then
+      cmd.state = table.remove( cmd.statestack ) or 'regular'
+      cmd.rkey = nil
+    else
+      table.insert( cmd.statestack, cmd.state )
       cmd.state = 'record-getkey'
-    elseif cmd.state == 'record' then
-      cmd.state = 'regular'
-      cmd.rpid = nil
     end
   elseif command == 'play' then -- only starts playback phase
-    if cmd.state == 'regular' then
-      cmd.state = 'playback-getkey'
-    end
+    table.insert( cmd.statestack, cmd.state )
+    cmd.state = 'playback-getkey'
   elseif command >= '0' and command <= '9' then
     if cmd.state ~= 'record-getkey' and cmd.state ~= 'playback-getkey' then
       cmd.repeatrate = cmd.repeatrate * 10 + tonumber( command )
     else
       -- gah, code duplication sucks
-      cmd.rpid = command
       if cmd.state == 'record-getkey' then -- set up record buffer
-        cmd.records[ cmd.rpid ] = {}
+        cmd.rkey = command
+        cmd.records[ cmd.rkey ] = {}
         cmd.state = 'record'
         cmd.repeatrate = 0
       elseif cmd.state == 'playback-getkey' then -- parse record buffer
@@ -116,15 +129,15 @@ function cmd.process( command )
         else
           playback( command )
         end
-        cmd.state = 'regular'
+        cmd.state = table.remove( cmd.statestack ) or 'regular'
       end
     end
   else
     if cmd.state == 'record-getkey' then
       cmd.state = 'record'
       cmd.repeatrate = 0
-      cmd.rpid = command
-      cmd.records[ cmd.rpid ] = {}
+      cmd.rkey = command
+      cmd.records[ cmd.rkey ] = {}
     elseif cmd.state == 'playback-getkey' then
       -- grab results from records db and put all into commandq
       if cmd.repeatrate > 0 then
@@ -135,7 +148,7 @@ function cmd.process( command )
       else
         playback( command )
       end
-      cmd.state = 'regular'
+      cmd.state = table.remove( cmd.statestack ) or 'regular'
     end
   end
 end
@@ -153,6 +166,7 @@ function cmd.execute( bot )
       bot.y = bot.y + 1
     end
     -- debug
+    table.foreach( cmd.statestack, function( k, v ) io.write( v .. " " ) end )
     print( cmd.state .. " " .. command )
   end
 end
