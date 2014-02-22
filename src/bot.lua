@@ -9,6 +9,7 @@ function bot.init()
   bot.sheet = love.graphics.newImage( "art/spritesheets/rob.png" )
   bot.anims = {}
   bot.anims[ 'mr' ] = newAnimation( bot.sheet, 64, 64, 0.5, 4 )
+  -- specify ml, mu, md when sprites become available
   bot.anim = bot.anims[ 'mr' ]
 end
 

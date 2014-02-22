@@ -24,6 +24,14 @@ end
 
 function love.update( dt )
   cmd.execute( bot )
+
+  -- sanitize position
+  if bot.x < 1         then bot.x = 1 end
+  if bot.x > map.width then bot.x = map.width end
+
+  if bot.y < 1          then bot.y = 1 end
+  if bot.y > map.height then bot.y = map.height end
+
   bot.anim:update( dt )
 end
 
