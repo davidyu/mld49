@@ -59,16 +59,31 @@ function cmd.toCommand( key )
   end
 end
 
+-- helper/aux functions for cmd.process (all have side effects!)
+local function playback( id )
+  local record = cmd.records[ id ]
+  if record ~= nil then
+    for _, entry in ipairs( record ) do
+      table.insert( cmd.commandq, entry )
+    end
+  end
+end
+
 function cmd.process( command )
   if command == 'ml' or command == 'mr' or command == 'mu' or command == 'md' then
     -- also take into account record state <- save to record instead
     if cmd.repeatrate > 0 then
-      print( cmd.repeatrate )
       for i = 1,cmd.repeatrate do
+        if cmd.state == 'record' then
+          table.insert( cmd.records[ cmd.rpid ], command )
+        end
         table.insert( cmd.commandq, command )
       end
       cmd.repeatrate = 0
     else
+      if cmd.state == 'record' then
+        table.insert( cmd.records[ cmd.rpid ], command )
+      end
       table.insert( cmd.commandq, command )
     end
   elseif command == 'rec' then -- starts and ends record phase
@@ -86,14 +101,40 @@ function cmd.process( command )
     if cmd.state ~= 'record-getkey' and cmd.state ~= 'playback-getkey' then
       cmd.repeatrate = cmd.repeatrate * 10 + tonumber( command )
     else
+      -- gah, code duplication sucks
       cmd.rpid = command
+      if cmd.state == 'record-getkey' then -- set up record buffer
+        cmd.records[ cmd.rpid ] = {}
+        cmd.state = 'record'
+        cmd.repeatrate = 0
+      elseif cmd.state == 'playback-getkey' then -- parse record buffer
+        if cmd.repeatrate > 0 then
+          for i = 1,cmd.repeatrate do
+            playback( command )
+          end
+          cmd.repeatrate = 0
+        else
+          playback( command )
+        end
+        cmd.state = 'regular'
+      end
     end
   else
     if cmd.state == 'record-getkey' then
       cmd.state = 'record'
+      cmd.repeatrate = 0
       cmd.rpid = command
+      cmd.records[ cmd.rpid ] = {}
     elseif cmd.state == 'playback-getkey' then
-      -- parse results from playback db and put all into commandq
+      -- grab results from records db and put all into commandq
+      if cmd.repeatrate > 0 then
+        for i = 1,cmd.repeatrate do
+          playback( command )
+        end
+        cmd.repeatrate = 0
+      else
+        playback( command )
+      end
       cmd.state = 'regular'
     end
   end
