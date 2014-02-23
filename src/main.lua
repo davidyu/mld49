@@ -23,7 +23,22 @@ function love.keypressed( key )
   cmd.process( command )
 end
 
+-- true if won, false otherwise
+local function won( bot, map )
+  if bot.x == map.dest.x and bot.y == map.dest.y then
+    return true
+  else
+    return false
+  end
+end
+
 function love.update( dt )
+
+  -- update anims
+  bot.anim:update( dt )
+  table.foreach( doodad.anims, function( _, anim ) anim:update( dt ) end )
+
+  -- execute commands
   cmd.execute( bot )
 
   -- sanitize position
@@ -33,8 +48,12 @@ function love.update( dt )
   if bot.y < 1          then bot.y = 1 end
   if bot.y > map.height then bot.y = map.height end
 
-  bot.anim:update( dt )
-  table.foreach( doodad.anims, function( _, anim ) anim:update( dt ) end )
+  -- check for win condition
+  if won( bot, map ) then
+    print( "won" )
+    -- play brief celebratory overlay
+    -- go to next level
+  end
 end
 
 function love.draw()
