@@ -11,7 +11,7 @@ function utils.buildMap( path )
   map.tileheight = mapdata.tileheight
   map.tileset = love.graphics.newImage( mapdata.tilesets[1].image.source )
   for i, tilelayer in ipairs( mapdata.tilelayers ) do
-    if i == 1 then
+    if tilelayer.name == 'base' then
       map.tiles = {}
       local tilesetwidth = mapdata.tilesets[1].image.width / mapdata.tilesets[1].tilewidth
       for j, tile in ipairs( tilelayer.tiles ) do

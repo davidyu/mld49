@@ -21,13 +21,33 @@ return {
       properties = { 
       },
     },
+    {
+      name = "doodads_ref_tilesheet",
+      tilewidth = 64,
+      tileheight = 64,
+      spacing = 0,
+      margin = 0,
+      image = {
+        source = "art/doodads/doodads_ref_tilesheet.png",
+        width = "320",
+        height = "64",
+      },
+      properties = { 
+      },
+    },
   },
   tilelayers = { 
     {
-      name = "Tile Layer 1",
+      name = "base",
       properties = { 
       },
       tiles = { {id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 1,},{id = 1,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 1,},{id = 1,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,},{id = 0,}, },
+    },
+    {
+      name = "doodads",
+      properties = { 
+      },
+      tiles = { {id = 0,},false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,{id = 1,}, },
     },
   },
   objectgroups = { 
