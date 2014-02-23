@@ -4,6 +4,6 @@ connector = require( './db-connector' );
 var robo = express();
 
 robo.post( '/submitscore', connector.submitScore );
-robo.get( '/gethighscores/', connector.getHighScores );
+robo.get( '/gethighscores/:level', connector.getHighScoresByLevel );
 
-robo.listen( 6000 );
+robo.listen( 7000 );

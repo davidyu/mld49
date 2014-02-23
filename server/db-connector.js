@@ -17,17 +17,28 @@ exports.submitScore = function( req, res ) {
 
 }
 
-exports.getHighScores = function( req, res ) {
-
+exports.getHighScoresByLevel = function( req, res ) {
+  var level = req.params.level
+  db.collection( "commands", function( e, collection ) {
+    collection.find( { "level": level } ).toArray( function( e, items ) {
+      items.sort( function( a, b ) {
+        if ( a.commands.length < b.commands.length ) return -1;
+        if ( a.commands.length > b.commands.length ) return 1;
+        return 0;
+      } );
+      // only get top 10
+      res.jsonp( items.slice( 0, 10 ) );
+    } )
+  } );
 }
 
 var populateDBWithTestData = function() {
   var commands = [
-   { "level": "art/levels/intro", "player": "desktop", "commands": [ "mr", "md" ] },
-   { "level": "art/levels/intro", "player": "desktop", "commands": [ "mr", "mr", "md" ] },
-   { "level": "art/levels/square", "player": "desktop", "commands": [ "1", "0", "mr", "1", "0", "md" ] },
-   { "level": "art/levels/short", "player": "desktop", "commands": [ "8", "mr" ] },
-   { "level": "art/levels/long", "player": "desktop", "commands": [ "1", "0", "0", "mr" ] },
+   { "level": "intro", "player": "desktop", "commands": [ "mr", "md" ] },
+   { "level": "intro", "player": "desktop", "commands": [ "mr", "mr", "md" ] },
+   { "level": "square", "player": "desktop", "commands": [ "1", "0", "mr", "1", "0", "md" ] },
+   { "level": "short", "player": "desktop", "commands": [ "8", "mr" ] },
+   { "level": "long", "player": "desktop", "commands": [ "1", "0", "0", "mr" ] },
   ];
 
   db.collection( "commands", function( e, collection ) {
