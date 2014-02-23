@@ -15,7 +15,7 @@ return {
       margin = 0,
       image = {
         source = "art/tiles/main_tiles.png",
-        width = "128",
+        width = "192",
         height = "64",
       },
       properties = { 

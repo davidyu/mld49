@@ -78,7 +78,9 @@ function love.draw()
   end
 
   -- draw doodads
-  doodad.destanim:draw( ( map.dest.x - 1 ) * map.tilewidth, ( map.dest.y - 1 ) * map.tileheight )
+  if ( map.dest.x and map.dest.y ) then
+    doodad.destanim:draw( ( map.dest.x - 1 ) * map.tilewidth, ( map.dest.y - 1 ) * map.tileheight )
+  end
 
   -- draw bot
   bot.anim:draw( ( bot.x - 1 ) * map.tilewidth, ( bot.y - 1 ) * map.tileheight )
