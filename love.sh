@@ -5,4 +5,7 @@ ART_SRC=src/art/src
 MAP_OUT=src/art/levels
 
 CUR=$(pwd)
-zip -r automaton.love ${CUR}/${SRC}/*
+cd ${SRC}
+zip -r automaton.love *
+cd ${CUR}
+mv ${SRC}/automaton.love ${CUR}/
