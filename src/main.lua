@@ -2,20 +2,33 @@
 require 'vendor/AnAL'
 
 -- modules
-local utils = require 'utils'
 local bot = require 'bot'
 local cmd = require 'cmd'
 local doodad = require 'doodad'
+local flow = require 'flow'
 
 -- static game data
 local map
 
+local function resetlevel()
+  map = flow.map
+
+  bot.x = map.start.x
+  bot.y = map.start.y
+
+  cmd.init()
+end
+
 function love.load()
   love.window.setMode( 640, 640 ) -- temporary
-  map = utils.buildMap( "art/levels/intro" )
+
+  -- init all modules
+  flow.init()
   cmd.init()
   bot.init()
   doodad.init()
+
+  resetlevel()
 end
 
 function love.keypressed( key )
@@ -50,9 +63,9 @@ function love.update( dt )
 
   -- check for win condition
   if won( bot, map ) then
-    print( "won" )
     -- play brief celebratory overlay
-    -- go to next level
+    flow.advance()
+    resetlevel()
   end
 end
 

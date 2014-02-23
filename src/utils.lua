@@ -5,6 +5,7 @@ function utils.buildMap( path )
           "the level " .. path .. "does not exist!" )
   local mapdata = love.filesystem.load( path .. ".lua" )() -- executable output from tmx2lua
   local map = {}
+  map.name = path
   map.width = mapdata.width
   map.height = mapdata.height
   map.tilewidth = mapdata.tilewidth
