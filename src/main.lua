@@ -1,5 +1,6 @@
--- vendor libs
+-- libs
 require 'vendor/AnAL'
+require 'socket.http'
 
 -- modules
 local bot = require 'bot'
@@ -32,7 +33,7 @@ function love.load()
   -- init all modules
   flow.init()
   cmd.init()
-  bot.init()
+  bot.init( "desktop" )
   doodad.init()
   camera:init()
 
@@ -51,6 +52,37 @@ local function won( bot, map )
   else
     return false
   end
+end
+
+local function toJSONArray( array )
+  local arr = "["
+  for i, elem in ipairs( array, elem ) do
+    arr = arr .. [["]] .. elem .. [["]]
+    if i < table.maxn( array ) then
+      arr = arr .. ","
+    end
+  end
+  arr = arr .. "]"
+  return arr
+end
+
+local function submitcommands( commands )
+  local request = [[player=]]..bot.name..[[&level=]]..map.name..[[&commands=]]..toJSONArray( commands )
+  local response = {}
+  local res, code, _ = socket.http.request ( {
+    url = "http://localhost:7000/submitscore";
+    method = "POST";
+    headers = { [ "Content-Type" ] = "application/x-www-form-urlencoded";
+                [ "Content-Length" ] = #request;
+              };
+    source = ltn12.source.string( request );
+    sink = ltn12.sink.table( response );
+  } )
+
+  -- debug
+  print( "Command submit status:", res and "OK" or "FAILED" )
+
+  return res and true, 1 or false, 0
 end
 
 function love.update( dt )
@@ -75,6 +107,13 @@ function love.update( dt )
   -- check for win condition
   if won( bot, map ) then
     -- play brief celebratory overlay
+    -- submit commands to server
+
+    local success, percentile = submitcommands( cmd.buffer )
+    if success then
+      print( percentile )
+    end
+
     flow.advance()
     resetlevel()
   end

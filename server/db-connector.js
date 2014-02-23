@@ -14,7 +14,8 @@ mongoClient.open( function( e, mongoClient ) {
 } );
 
 exports.submitScore = function( req, res ) {
-
+  console.log( req.body );
+  res.jsonp( ["hello"] );
 }
 
 exports.getHighScoresByLevel = function( req, res ) {

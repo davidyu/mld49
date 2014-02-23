@@ -7,6 +7,7 @@ function cmd.init()
   cmd.repeatrate = 0
   cmd.state = 'regular'
   cmd.statestack = {}
+  cmd.buffer = {}
 end
 
 function cmd.toCommand( key )
@@ -83,8 +84,13 @@ local function playback( id )
 end
 
 function cmd.process( command )
+  -- record to buffer
+  if command ~= "unknown" then
+    table.insert( cmd.buffer, command )
+  end
+
+  -- process
   if command == 'ml' or command == 'mr' or command == 'mu' or command == 'md' then
-    -- also take into account record state <- save to record instead
     if cmd.repeatrate > 0 then
       for i = 1,cmd.repeatrate do
         if cmd.state == 'record' then

@@ -25,7 +25,7 @@ function flow.init()
 end
 
 function flow.advance()
-  print( nextLevel() )
+  print( "advancing to: " .. nextLevel() )
   if flow.map.name ~= "art/levels/end" and nextLevel() ~= nil then
     flow.map = utils.buildMap( nextLevel() )
   end

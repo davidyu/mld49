@@ -2,10 +2,11 @@ require 'vendor/AnAL'
 
 local bot = {}
 
-function bot.init()
+function bot.init( name )
   bot.x = 1
   bot.y = 1
   bot.state = 'idle'
+  bot.name = name
   bot.sheet = love.graphics.newImage( "art/spritesheets/rob.png" )
   bot.anims = {}
   bot.anims[ 'mr' ] = newAnimation( bot.sheet, 64, 64, 0.5, 4 )
