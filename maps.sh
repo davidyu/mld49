@@ -20,9 +20,12 @@ do
     # remove tmx extension
     map_long=${tmx%\.*}
     # append lua extension
-    out="${map_long}.lua"
-    out_short="${map_long%_map}.lua"
-    cp ${SRC}/${out} ${MAP_OUT}/${out_short}
+    out="${map_long}.lua" # there is an actual file named this
+    out_short="${map_long%_map}.lua" # this is the destination file name
+
+    # replace all instances of ../ with art/
+    sed 's/\.\.\//art\//g' ${SRC}/${out} > ${MAP_OUT}/${out_short}
+
     # remove map tmx and lua files
     rm ${SRC}/${tmx} ${SRC}/${out}
 done
