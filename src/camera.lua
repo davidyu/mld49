@@ -17,7 +17,11 @@ function math.clamp(x, min, max)
 end
 
 function camera:init()
-  self.screenw, self.screenh = love.window.getDimensions()
+  if love.window ~= nil then
+    self.screenw, self.screenh = love.window.getDimensions()
+  else
+    self.screenw, self.screenh, _, _, _ = love.graphics.getMode()
+  end
 end
 
 function camera:set()

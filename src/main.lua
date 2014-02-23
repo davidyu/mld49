@@ -23,7 +23,11 @@ local function resetlevel()
 end
 
 function love.load()
-  love.window.setMode( 640, 640 )
+  if love.window ~= nil then
+    love.window.setMode( 640, 640 )
+  else
+    love.graphics.setMode( 640, 640 )
+  end
 
   -- init all modules
   flow.init()
@@ -82,7 +86,11 @@ function love.draw()
   -- draw map
   for y = 1, map.height do
     for x = 1, map.width do
-      love.graphics.draw( map.tileset, map.tiles[ ( y - 1 ) * map.width + x ], ( x - 1 ) * map.tilewidth, ( y - 1 ) * map.tileheight )
+      if love.graphics.drawq ~= nil then
+        love.graphics.drawq( map.tileset, map.tiles[ ( y - 1 ) * map.width + x ], ( x - 1 ) * map.tilewidth, ( y - 1 ) * map.tileheight )
+      else
+        love.graphics.draw( map.tileset, map.tiles[ ( y - 1 ) * map.width + x ], ( x - 1 ) * map.tilewidth, ( y - 1 ) * map.tileheight )
+      end
     end
   end
 
