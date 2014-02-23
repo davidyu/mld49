@@ -1,4 +1,3 @@
-
 -- vendor libs
 require 'vendor/AnAL'
 
@@ -6,6 +5,7 @@ require 'vendor/AnAL'
 local utils = require 'utils'
 local bot = require 'bot'
 local cmd = require 'cmd'
+local doodad = require 'doodad'
 
 -- static game data
 local map
@@ -15,6 +15,7 @@ function love.load()
   map = utils.buildMap( "art/levels/intro" )
   cmd.init()
   bot.init()
+  doodad.init()
 end
 
 function love.keypressed( key )
@@ -33,6 +34,7 @@ function love.update( dt )
   if bot.y > map.height then bot.y = map.height end
 
   bot.anim:update( dt )
+  table.foreach( doodad.anims, function( _, anim ) anim:update( dt ) end )
 end
 
 function love.draw()
@@ -43,6 +45,10 @@ function love.draw()
     end
   end
 
+  -- draw doodads
+  doodad.destanim:draw( ( map.dest.x - 1 ) * map.tilewidth, ( map.dest.y - 1 ) * map.tileheight )
+
   -- draw bot
   bot.anim:draw( ( bot.x - 1 ) * map.tilewidth, ( bot.y - 1 ) * map.tileheight )
+
 end
