@@ -1,6 +1,7 @@
 -- libs
 require 'vendor/AnAL'
 require 'socket.http'
+gui = require 'vendor/Quickie'
 
 -- modules
 local bot = require 'bot'
