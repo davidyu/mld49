@@ -1,0 +1,10 @@
+{
+    "name": "rob-app",
+    "description": "simple REST server to keep track of high scores and compute player result histograms",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "express": "3.x",
+        "mongodb": "*"
+    }
+}
