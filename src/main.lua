@@ -67,7 +67,7 @@ local function toJSONArray( array )
 end
 
 local function submitcommands( commands )
-  local request = [[player=]]..bot.name..[[&level=]]..map.name..[[&commands=]]..toJSONArray( commands )
+  local request = [[player=]]..bot.name..[[&level=]]..map.name:gsub( "art/levels/", "" )..[[&commands=]]..toJSONArray( commands )
   local response = {}
   local res, code, _ = socket.http.request ( {
     url = "http://localhost:7000/submitscore";
@@ -82,7 +82,7 @@ local function submitcommands( commands )
   -- debug
   print( "Command submit status:", res and "OK" or "FAILED" )
 
-  return res and true, 1 or false, 0
+  return res and true, table.remove( response ) or false, 0
 end
 
 function love.update( dt )
