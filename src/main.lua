@@ -70,7 +70,7 @@ local function submitcommands( commands )
   local request = [[player=]]..bot.name..[[&level=]]..map.name:gsub( "art/levels/", "" )..[[&commands=]]..toJSONArray( commands )
   local response = {}
   local res, code, _ = socket.http.request ( {
-    url = "http://localhost:7000/submitscore";
+    url = "http://168.62.40.105:7000/submitscore";
     method = "POST";
     headers = { [ "Content-Type" ] = "application/x-www-form-urlencoded";
                 [ "Content-Length" ] = #request;
@@ -79,10 +79,18 @@ local function submitcommands( commands )
     sink = ltn12.sink.table( response );
   } )
 
-  -- debug
-  print( "Command submit status:", res and "OK" or "FAILED" )
-
   return res and true, table.remove( response ) or false, 0
+end
+
+local function gethighscores()
+  local response = {}
+  local res, code, _ = socket.http.request ( {
+    url = "http://168.62.40.105:7000/gethighscores/"..map.name:gsub( "art/levels/", "" );
+    sink = ltn12.sink.table( response );
+  } )
+
+  -- debug
+  table.foreach( response, print )
 end
 
 function love.update( dt )
@@ -113,6 +121,8 @@ function love.update( dt )
     if success then
       print( percentile )
     end
+
+    gethighscores()
 
     flow.advance()
     resetlevel()
