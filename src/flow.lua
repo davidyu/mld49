@@ -4,7 +4,7 @@ local utils = require 'utils'
 
 local function nextLevel()
   for i, level in ipairs( flow.seq ) do
-    if level == flow.map then
+    if level == flow.map.name then
       return flow.seq[ i + 1 ]
     end
   end
@@ -14,6 +14,7 @@ end
 function flow.init()
   flow.seq = {}
 
+  -- specify list of levels
   table.insert( flow.seq, "art/levels/intro" )
   table.insert( flow.seq, "art/levels/square" )
   table.insert( flow.seq, "art/levels/short" )
@@ -24,8 +25,9 @@ function flow.init()
 end
 
 function flow.advance()
+  print( nextLevel() )
   if flow.map.name ~= "art/levels/end" and nextLevel() ~= nil then
-    flow.map = nextLevel()
+    flow.map = utils.buildMap( nextLevel() )
   end
 end
 
