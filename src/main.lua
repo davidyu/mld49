@@ -23,13 +23,14 @@ local function resetlevel()
 end
 
 function love.load()
-  love.window.setMode( 640, 640 ) -- temporary
+  love.window.setMode( 640, 640 )
 
   -- init all modules
   flow.init()
   cmd.init()
   bot.init()
   doodad.init()
+  camera:init()
 
   resetlevel()
 end

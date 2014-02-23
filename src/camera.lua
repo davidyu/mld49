@@ -2,7 +2,8 @@ local camera = {}
 
 camera.x = 0
 camera.y = 0
-camera.screenw, camera.screenh = love.window.getDimensions()
+camera.screenw = nil
+camera.screenh = nil
 camera.bounds = nil
 
 function math.clamp(x, min, max)
@@ -13,6 +14,10 @@ function math.clamp(x, min, max)
   else
     return x
   end
+end
+
+function camera:init()
+  self.screenw, self.screenh = love.window.getDimensions()
 end
 
 function camera:set()
