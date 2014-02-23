@@ -1,3 +1,6 @@
 [submodule "src/vendor/Quickie"]
 	path = src/vendor/Quickie
 	url = https://github.com/vrld/Quickie
+[submodule "src/vendor/hump"]
+	path = src/vendor/hump
+	url = git@github.com:vrld/hump.git
