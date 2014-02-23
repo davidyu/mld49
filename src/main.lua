@@ -6,6 +6,7 @@ local bot = require 'bot'
 local cmd = require 'cmd'
 local doodad = require 'doodad'
 local flow = require 'flow'
+local camera = require 'camera'
 
 -- static game data
 local map
@@ -15,6 +16,8 @@ local function resetlevel()
 
   bot.x = map.start.x
   bot.y = map.start.y
+
+  camera:setbounds( 0, 0, map.tilewidth * map.width, map.tileheight * map.height )
 
   cmd.init()
 end
@@ -61,6 +64,9 @@ function love.update( dt )
   if bot.y < 1          then bot.y = 1 end
   if bot.y > map.height then bot.y = map.height end
 
+  -- update camera
+  camera:update( bot, map )
+
   -- check for win condition
   if won( bot, map ) then
     -- play brief celebratory overlay
@@ -70,6 +76,8 @@ function love.update( dt )
 end
 
 function love.draw()
+  camera:set()
+
   -- draw map
   for y = 1, map.height do
     for x = 1, map.width do
@@ -85,4 +93,5 @@ function love.draw()
   -- draw bot
   bot.anim:draw( ( bot.x - 1 ) * map.tilewidth, ( bot.y - 1 ) * map.tileheight )
 
+  camera:unset()
 end
