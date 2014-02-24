@@ -56,6 +56,7 @@ function menu.changename:update( dt )
     savename( menu.changename.inputstr.text )
     if menu.needname then
       gamestate.switch( game )
+      gamestate.push( game.help )
     else
       gamestate.switch( menu )
     end
