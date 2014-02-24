@@ -1,9 +1,13 @@
 -- libs
 require 'vendor/AnAL'
 require 'socket.http'
-gamestate = require 'vendor/hump/gamestate'
+local gui = require 'vendor/Quickie'
+local gamestate = require 'vendor/hump/gamestate'
+local json = loadfile( "vendor/json.lua" )()
 
+local fonts = {}
 local game = {}
+game.stats = {}
 
 -- modules
 local map = nil
@@ -74,10 +78,84 @@ local function gethighscores()
   } )
 
   -- debug
-  table.foreach( response, print )
+  -- table.foreach( response, print )
+
+  return json:decode( response[1] )
 end
 
-function game:enter()
+function game.stats:enter( from )
+  game.stats.parent = from
+
+  local success, percentile = submitcommands( cmd.buffer )
+  if success then
+    game.stats.percentile = tonumber( percentile )
+    game.stats.highscores = gethighscores()
+    game.stats.topresult = game.stats.highscores[1]
+  else
+    game.stats.percentile = nil
+  end
+end
+
+-- thanks to http://lua-users.org/wiki/SimpleRound
+local function round(num, idp)
+  return tonumber(string.format("%." .. (idp or 0) .. "f", num))
+end
+
+function game.stats:update( dt )
+  gui.group.push{ grow = "down", pos = { 250, 240 } }
+
+  love.graphics.setFont( fonts["title"] )
+  local usedFewestCommands = ( table.maxn( game.stats.topresult["commands"] ) >= table.maxn( cmd.buffer ) )
+  if usedFewestCommands or game.stats.percentile and game.stats.percentile > 85 then
+    gui.Label{ text = "AWESOME!!!", align = "center" }
+  elseif game.stats.percentile and game.stats.percentile > 65 then
+    gui.Label{ text = "GREAT!!", align = "center" }
+  else
+    gui.Label{ text = "PASS!", align = "center" }
+  end
+  love.graphics.setFont( fonts["button"] )
+  gui.Label{ text = "you used " .. table.maxn( cmd.buffer ) .. " commands in total.", align = "center" }
+
+  if game.stats.percentile then
+    if usedFewestCommands or game.stats.percentile > 85 then
+      gui.Label{ text = "the top player on this level used " .. table.maxn( game.stats.topresult["commands"] ) .. " commands in total.", align = "center" }
+    end
+    gui.Label{ text = bot.name .. "'s percentile rank on this level: " .. round( game.stats.percentile, 2 ), align = "center" }
+  end
+
+  gui.group.pop()
+  gui.group.push{ grow = "down", pos = { 250, 400 } }
+  love.graphics.setFont( fonts["button"] )
+  if gui.Button{ text = "advance [spc]", align = "center" } then
+    flow.advance()
+    resetlevel()
+    gamestate.pop()
+  end
+  gui.group.pop()
+end
+
+function game.stats:keypressed( key, code )
+  if key == ' ' then
+    flow.advance()
+    resetlevel()
+    gamestate.pop()
+  end
+end
+
+function game.stats:draw()
+  game.stats.parent:draw()
+
+  -- draw stats overlay
+
+  local r, g, b, a = love.graphics.getColor()
+  love.graphics.setColor( 0, 0, 0, 128 )
+  love.graphics.rectangle( "fill", 0, 220, 640, 200 )
+  love.graphics.setColor( r, g, b, a )
+
+  gui.core.draw()
+end
+
+function game:init()
   -- init all modules
   flow.init()
   cmd.init()
@@ -85,6 +163,10 @@ function game:enter()
   doodad.init()
   camera:init()
   resetlevel()
+  fonts = {
+    ["title"] = love.graphics.newFont( "art/fonts/typeone.ttf", 60 );
+    ["button"] = love.graphics.newFont( "art/fonts/BebasNeue.otf", 15 )
+  }
 end
 
 function game:update( dt )
@@ -111,15 +193,7 @@ function game:update( dt )
     -- play brief celebratory overlay
     -- submit commands to server
 
-    local success, percentile = submitcommands( cmd.buffer )
-    if success then
-      print( percentile )
-    end
-
-    gethighscores()
-
-    flow.advance()
-    resetlevel()
+    gamestate.push( game.stats )
   end
 end
 

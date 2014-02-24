@@ -1,3 +1,5 @@
+local gamestate = require 'vendor/hump/gamestate'
+
 -- gamestates
 local menu = require 'menu'
 local game = require 'game'
