@@ -9,6 +9,7 @@ local json = require 'vendor/json'
 local fonts = {}
 local game = {}
 game.stats = {}
+game.help = {}
 
 -- modules
 local map = nil
@@ -32,6 +33,9 @@ end
 function game:keypressed( key )
   local command = cmd.toCommand( key )
   cmd.process( command )
+  if key == '/' and ( love.keyboard.isDown( 'lshift' ) or love.keyboard.isDown( 'rshift' ) ) then
+    gamestate.push( game.help )
+  end
 end
 
 -- true if won, false otherwise
@@ -147,13 +151,38 @@ function game.stats:draw()
   game.stats.parent:draw()
 
   -- draw stats overlay
-
   local r, g, b, a = love.graphics.getColor()
   love.graphics.setColor( 0, 0, 0, 128 )
   love.graphics.rectangle( "fill", 0, 220, 640, 200 )
   love.graphics.setColor( r, g, b, a )
 
   gui.core.draw()
+end
+
+function game.help:enter( from )
+  game.help.parent = from
+  game.help.overlayimg = love.graphics.newImage( "art/overlays/helpscreen.png" )
+end
+
+function game.help:update( dt )
+  gui.group.push{ grow = "down", pos = { 275, 475 } }
+  love.graphics.setFont( fonts["button"] )
+  if gui.Button{ text = "got it [spc]", align = "center" } then
+    gamestate.pop()
+  end
+  gui.group.pop()
+end
+
+function game.help:draw()
+  self.parent:draw()
+  love.graphics.draw( self.overlayimg, 170, 150 )
+  gui.core.draw()
+end
+
+function game.help:keypressed( key )
+  if key == 'escape' or key == ' ' then
+    gamestate.pop()
+  end
 end
 
 function game:init()
