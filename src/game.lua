@@ -81,7 +81,7 @@ function game:enter()
   -- init all modules
   flow.init()
   cmd.init()
-  bot.init( "desktop" )
+  bot.init()
   doodad.init()
   camera:init()
   resetlevel()
@@ -146,6 +146,10 @@ function game:draw()
   bot.anim:draw( ( bot.x - 1 ) * map.tilewidth, ( bot.y - 1 ) * map.tileheight )
 
   camera:unset()
+end
+
+function game.getbot()
+  return bot
 end
 
 return game
