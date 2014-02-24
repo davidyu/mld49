@@ -19,6 +19,8 @@ function flow.init()
   table.insert( flow.seq, "art/levels/square" )
   table.insert( flow.seq, "art/levels/short" )
   table.insert( flow.seq, "art/levels/long" )
+  table.insert( flow.seq, "art/levels/staircase" )
+  table.insert( flow.seq, "art/levels/seashell" )
   table.insert( flow.seq, "art/levels/end" )
 
   flow.map = utils.buildMap( flow.seq[ 1 ] )
