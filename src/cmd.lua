@@ -172,8 +172,8 @@ function cmd.execute( bot )
       bot.y = bot.y + 1
     end
     -- debug
-    table.foreach( cmd.statestack, function( k, v ) io.write( v .. " " ) end )
-    print( cmd.state .. " " .. command )
+    -- table.foreach( cmd.statestack, function( k, v ) io.write( v .. " " ) end )
+    -- print( cmd.state .. " " .. command )
   end
 end
 

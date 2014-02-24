@@ -177,14 +177,20 @@ function game:update( dt )
   table.foreach( doodad.anims, function( _, anim ) anim:update( dt ) end )
 
   -- execute commands
+  local oldx, oldy = bot.x, bot.y
   cmd.execute( bot )
 
   -- sanitize position
+
   if bot.x < 1         then bot.x = 1 end
   if bot.x > map.width then bot.x = map.width end
 
   if bot.y < 1          then bot.y = 1 end
   if bot.y > map.height then bot.y = map.height end
+
+  if map.isWall[ bot.x + ( bot.y - 1 )* map.width ] then
+    bot.x, bot.y = oldx, oldy
+  end
 
   -- update camera
   camera:update( bot, map )

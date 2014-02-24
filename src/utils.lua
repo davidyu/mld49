@@ -14,11 +14,13 @@ function utils.buildMap( path )
   for i, tilelayer in ipairs( mapdata.tilelayers ) do
     if tilelayer.name == 'base' then
       map.tiles = {}
+      map.isWall = {}
       local tilesetwidth = mapdata.tilesets[1].image.width / mapdata.tilesets[1].tilewidth
       for j, tile in ipairs( tilelayer.tiles ) do
         local tx = ( tilelayer.tiles[j].id % tilesetwidth ) * map.tilewidth
         local ty = math.floor( tilelayer.tiles[j].id / tilesetwidth ) * map.tileheight
         map.tiles[j] = love.graphics.newQuad( tx, ty, mapdata.tilewidth, mapdata.tileheight, mapdata.tilesets[1].image.width, mapdata.tilesets[1].image.height )
+        map.isWall[j] = tilelayer.tiles[j].id == 1 -- LOL
       end
     elseif tilelayer.name == 'doodads' then
       map.start = {}
