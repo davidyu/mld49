@@ -5,8 +5,9 @@ require 'socket.http'
 local gui = require 'vendor/Quickie'
 local gamestate = require 'vendor/hump/gamestate'
 local json = require 'vendor/json'
-
 local fonts = {}
+
+-- gamestates
 local game = {}
 game.stats = {}
 game.help = {}
@@ -28,6 +29,15 @@ local function resetlevel()
   camera:setbounds( 0, 0, map.tilewidth * map.width, map.tileheight * map.height )
 
   cmd.init()
+end
+
+local function nextlevel()
+  flow.advance()
+
+  -- check if we're done
+  if table.maxn( flow.seq ) == flow.currentindex() then
+    gamestate.switch( menu.credits )
+  end
 end
 
 function game:keypressed( key )
@@ -132,18 +142,16 @@ function game.stats:update( dt )
   gui.group.push{ grow = "down", pos = { 250, 400 } }
   love.graphics.setFont( fonts["button"] )
   if gui.Button{ text = "advance [spc]", align = "center" } then
-    flow.advance()
-    resetlevel()
-    gamestate.pop()
+    gamestate.pop() -- pop doesn't prevent code from executing
+    nextlevel()
   end
   gui.group.pop()
 end
 
 function game.stats:keypressed( key, code )
   if key == ' ' then
-    flow.advance()
-    resetlevel()
     gamestate.pop()
+    nextlevel()
   end
 end
 
@@ -187,7 +195,6 @@ end
 
 function game:init()
   -- init all modules
-  flow.init()
   cmd.init()
   bot.init()
   doodad.init()
@@ -269,6 +276,10 @@ function game:drawoverlays()
 
     love.graphics.setColor( r, g, b, a )
   end
+end
+
+function game:enter()
+  resetlevel()
 end
 
 function game:draw()

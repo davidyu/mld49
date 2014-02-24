@@ -2,6 +2,15 @@ local flow = {}
 
 local utils = require 'utils'
 
+function flow.currentindex()
+  for i, level in ipairs( flow.seq ) do
+    if level == flow.map.name then
+      return i
+    end
+  end
+  return nil
+end
+
 local function nextLevel()
   for i, level in ipairs( flow.seq ) do
     if level == flow.map.name then
@@ -9,6 +18,10 @@ local function nextLevel()
     end
   end
   return nil
+end
+
+function flow.reset()
+  flow.map = utils.buildMap( flow.seq[ 1 ] )
 end
 
 function flow.init()
@@ -28,9 +41,11 @@ function flow.init()
 end
 
 function flow.advance()
-  print( "advancing to: " .. nextLevel():gsub( "art/levels/", "" ) )
   if flow.map.name ~= "art/levels/end" and nextLevel() ~= nil then
     flow.map = utils.buildMap( nextLevel() )
+    return true
+  else
+    return false
   end
 end
 

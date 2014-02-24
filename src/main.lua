@@ -1,9 +1,8 @@
 local gamestate = require 'vendor/hump/gamestate'
 
--- gamestates
-local menu = require 'menu'
-local game = require 'game'
-local credits = {}
+-- public gamestates
+menu = require 'menu'
+game = require 'game'
 
 function love.load()
   if love.window ~= nil then
