@@ -7,8 +7,10 @@ game = require 'game'
 function love.load()
   if love.window ~= nil then
     love.window.setMode( 640, 640 )
+    love.window.setTitle( "automaton" )
   else
     love.graphics.setMode( 640, 640 )
+    love.graphics.setCaption( "automaton" )
   end
 
   gamestate.push( menu )
