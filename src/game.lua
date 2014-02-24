@@ -1,9 +1,10 @@
 -- libs
 require 'vendor/AnAL'
 require 'socket.http'
+
 local gui = require 'vendor/Quickie'
 local gamestate = require 'vendor/hump/gamestate'
-local json = loadfile( "vendor/json.lua" )()
+local json = require 'vendor/json'
 
 local fonts = {}
 local game = {}
