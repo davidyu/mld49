@@ -172,16 +172,13 @@ end
 
 function game:update( dt )
 
-  -- update anims
-  bot.anim:update( dt )
-  table.foreach( doodad.anims, function( _, anim ) anim:update( dt ) end )
-
   -- execute commands
   local oldx, oldy = bot.x, bot.y
   cmd.execute( bot )
 
-  -- sanitize position
+  bot.updateAnim( bot.x - oldx, bot.y - oldy )
 
+  -- sanitize position
   if bot.x < 1         then bot.x = 1 end
   if bot.x > map.width then bot.x = map.width end
 
@@ -194,6 +191,10 @@ function game:update( dt )
 
   -- update camera
   camera:update( bot, map )
+
+  -- update anims
+  bot.anim:update( dt )
+  table.foreach( doodad.anims, function( _, anim ) anim:update( dt ) end )
 
   -- check for win condition
   if won( bot, map ) then

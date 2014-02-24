@@ -6,18 +6,15 @@ function bot.init()
   bot.x = 1
   bot.y = 1
   bot.state = 'idle'
-  bot.sheet = love.graphics.newImage( "art/spritesheets/rob.png" )
   bot.anims = {}
-  bot.anims[ 'mr' ] = newAnimation( bot.sheet, 64, 64, 0.5, 4 )
-  -- specify ml, mu, md when sprites become available
+  bot.anims[ 'mr' ] = newAnimation( love.graphics.newImage( "art/spritesheets/rob.png" ), 64, 64, 0.5, 4 )
+  bot.anims[ 'ml' ] = newAnimation( love.graphics.newImage( "art/spritesheets/rob_l.png" ), 64, 64, 0.5, 4 )
   bot.anim = bot.anims[ 'mr' ]
 end
 
-function bot.smoothmove()
+function bot.updateAnim( dx, dy )
+  if dx > 0 then bot.anim = bot.anims[ 'mr' ]
+  elseif dx < 0 then bot.anim = bot.anims[ 'ml' ] end
 end
-
-function bot.fastmove()
-end
-
 
 return bot
