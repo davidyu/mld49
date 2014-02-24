@@ -78,6 +78,14 @@ function cmd.isrecording()
   return has( cmd.statestack, 'record' ) or cmd.state == 'record'
 end
 
+function cmd.recordkeys()
+  local keys = {}
+  for k, _ in pairs( cmd.records ) do
+    table.insert( keys, k )
+  end
+  return keys
+end
+
 local function playback( id )
   local record = cmd.records[ id ]
   local recordingInBackground = has( cmd.statestack, 'record' )

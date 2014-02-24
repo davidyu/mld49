@@ -205,6 +205,43 @@ function game:update( dt )
   end
 end
 
+function game:drawoverlays()
+  -- camera rec overlay - WTF such manual work
+  if cmd.isrecording() then
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.setColor( 0, 0, 0, 128 )
+    love.graphics.rectangle( "fill", 545, 5, 80, 28 )
+
+    love.graphics.setColor( 255, 0, 0, 255 )
+    love.graphics.circle( "fill", 560, 17, 5, 10 )
+
+    love.graphics.setColor( 255, 255, 255, 255 )
+    love.graphics.setFont( fonts["button"] )
+    love.graphics.print( "REC < " .. cmd.rkey .. " >", 570, 10 )
+
+    love.graphics.setColor( r, g, b, a )
+  end
+
+  -- available recordings
+  local keys = cmd.recordkeys()
+  if table.getn( keys ) > 0 then
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.setColor( 0, 0, 0, 128 )
+
+    love.graphics.rectangle( "fill", 545, 40, 80, 20 * ( table.getn( keys ) + 1 ) )
+
+    love.graphics.setColor( 255, 255, 255, 255 )
+    love.graphics.setFont( fonts["button"] )
+    love.graphics.print( "RECORDS:", 555, 45 )
+
+    for i, key in ipairs( keys ) do
+      love.graphics.print( "< " .. key .. " >", 555, 45 + i * 20 )
+    end
+
+    love.graphics.setColor( r, g, b, a )
+  end
+end
+
 function game:draw()
   camera:set()
 
@@ -229,20 +266,7 @@ function game:draw()
 
   camera:unset()
 
-  if cmd.isrecording() then
-    local r, g, b, a = love.graphics.getColor()
-    love.graphics.setColor( 0, 0, 0, 128 )
-    love.graphics.rectangle( "fill", 545, 5, 80, 28 )
-
-    love.graphics.setColor( 255, 0, 0, 255 )
-    love.graphics.circle( "fill", 560, 17, 5, 10 )
-
-    love.graphics.setColor( 255, 255, 255, 255 )
-    love.graphics.setFont( fonts["button"] )
-    love.graphics.print( "REC < " .. cmd.rkey .. " >", 570, 10 )
-
-    love.graphics.setColor( r, g, b, a )
-  end
+  game:drawoverlays()
 end
 
 function game.getbot()
