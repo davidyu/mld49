@@ -43,7 +43,12 @@ local function savename( name )
   bot.name = name
 end
 
+function menu.changename:enter()
+  bot.init() -- we want to use bot anims
+end
+
 function menu.changename:update( dt )
+  bot.anim:update( dt )
   gui.group.push{ grow = "right", pos = { 150, 300 } }
   gui.Label{ text = "please name your automaton:", size = { 150 } }
   gui.Input{ info = menu.changename.inputstr, size = { 100 } }
@@ -58,8 +63,9 @@ function menu.changename:update( dt )
   gui.group.pop{}
 end
 
-function menu.changename:draw( dt )
+function menu.changename:draw()
   gui.core.draw()
+  bot.anim:draw( 310, 230 )
 end
 
 function menu.changename:keypressed( key, code )
