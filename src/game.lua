@@ -81,7 +81,7 @@ local function gethighscores()
   -- debug
   -- table.foreach( response, print )
 
-  return json:decode( response[1] )
+  return json:decode( table.concat( response ) )
 end
 
 function game.stats:enter( from )
