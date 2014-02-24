@@ -144,6 +144,7 @@ function game.stats:update( dt )
   if gui.Button{ text = "advance [spc]", align = "center" } then
     gamestate.pop() -- pop doesn't prevent code from executing
     nextlevel()
+    resetlevel()
   end
   gui.group.pop()
 end
@@ -152,6 +153,7 @@ function game.stats:keypressed( key, code )
   if key == ' ' then
     gamestate.pop()
     nextlevel()
+    resetlevel()
   end
 end
 
@@ -273,6 +275,19 @@ function game:drawoverlays()
     for i, key in ipairs( keys ) do
       love.graphics.print( "< " .. key .. " >", 555, 45 + i * 20 )
     end
+
+    love.graphics.setColor( r, g, b, a )
+  end
+
+  -- action multiplier
+  if cmd.repeatrate > 0 then
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.setColor( 0, 0, 0, 128 )
+    love.graphics.rectangle( "fill", 5, 5, 200, 28 )
+
+    love.graphics.setColor( 255, 255, 255, 255 )
+    love.graphics.setFont( fonts["button"] )
+    love.graphics.print( "ACTION MULTIPLIER: " .. cmd.repeatrate .. "X", 15, 10 )
 
     love.graphics.setColor( r, g, b, a )
   end
