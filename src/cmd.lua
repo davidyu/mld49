@@ -58,7 +58,11 @@ function cmd.toCommand( key )
   elseif key >= '0' and key <= '9' then
     return key
   else
-    return 'unknown'
+    if cmd.state ~= 'playback-getkey' and cmd.state ~='record-getkey' then
+      return 'unknown'
+    else
+      return key
+    end
   end
 end
 
@@ -68,6 +72,10 @@ local function has( table, v )
     if value == v then return true end
   end
   return false
+end
+
+function cmd.isrecording()
+  return has( cmd.statestack, 'record' ) or cmd.state == 'record'
 end
 
 local function playback( id )

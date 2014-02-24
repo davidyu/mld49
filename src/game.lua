@@ -228,6 +228,21 @@ function game:draw()
   bot.anim:draw( ( bot.x - 1 ) * map.tilewidth, ( bot.y - 1 ) * map.tileheight )
 
   camera:unset()
+
+  if cmd.isrecording() then
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.setColor( 0, 0, 0, 128 )
+    love.graphics.rectangle( "fill", 545, 5, 80, 28 )
+
+    love.graphics.setColor( 255, 0, 0, 255 )
+    love.graphics.circle( "fill", 560, 17, 5, 10 )
+
+    love.graphics.setColor( 255, 255, 255, 255 )
+    love.graphics.setFont( fonts["button"] )
+    love.graphics.print( "REC < " .. cmd.rkey .. " >", 570, 10 )
+
+    love.graphics.setColor( r, g, b, a )
+  end
 end
 
 function game.getbot()
