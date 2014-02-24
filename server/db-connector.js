@@ -35,12 +35,7 @@ var MongoClient = require('mongodb').MongoClient,
 var mongoClient = new MongoClient( new Server( 'localhost', 27017 ) );
 mongoClient.open( function( e, mongoClient ) {
   db = mongoClient.db( "automatondb14" );
-  db.collection( "commands", { strict : true }, function( e, collection ) {
-    if ( e ) {
-      console.log( "commands collection does not exist. Injecting test data..." );
-      populateDBWithTestData();
-    }
-  } );
+  db.collection( "commands", { strict : true }, function( e, collection ) {} );
 } );
 
 sortByIncreasingCommandLength = function( a, b ) {
