@@ -30,6 +30,8 @@ local function resetlevel()
   local screenw, screenh = love.window.getDimensions()
   camera:setbounds( -map.tilewidth, -map.tileheight, map.tilewidth * ( map.width + 1 ) - screenw, map.tileheight * ( map.height + 1 ) - screenh )
 
+  camera:centerbot( bot, map )
+
   cmd.init()
 end
 
@@ -240,6 +242,7 @@ function game:update( dt )
   local oldx, oldy = bot.x, bot.y
   cmd.execute( bot )
 
+  local botmoved = bot.x ~= oldx or bot.y ~= oldy
   bot.updateAnim( bot.x - oldx, bot.y - oldy )
 
   -- sanitize position
@@ -254,7 +257,20 @@ function game:update( dt )
   end
 
   -- update camera
-  camera:update( bot, map )
+  if botmoved then
+    camera:centerbot( bot, map )
+  end
+
+  local margin = 30
+  if love.mouse.getX() - margin <= 0 then
+    camera:pan( 'left' )
+  elseif love.mouse.getX() + margin >= 640 then
+    camera:pan( 'right' )
+  elseif love.mouse.getY() - margin <= 0 then
+    camera:pan( 'up' )
+  elseif love.mouse.getY() + margin >= 640 then
+    camera:pan( 'down' )
+  end
 
   -- update anims
   bot.anim:update( dt )
