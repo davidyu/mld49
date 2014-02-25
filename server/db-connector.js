@@ -64,25 +64,14 @@ exports.submitScore = function( req, res ) {
 
 exports.getHighScoresByLevel = function( req, res ) {
   var level = req.params.level
+  var cutoff = 10;
+  if ( req.params.cutoff ) {
+    cutoff = parseInt( req.params.cutoff )
+  }
   db.collection( "commands", function( e, collection ) {
     collection.find( { "level": level } ).toArray( function( e, items ) {
       items.sort( sortByIncreasingCommandLength );
-      // only get top 10
-      res.jsonp( items.slice( 0, 10 ) );
+      res.jsonp( items.slice( 0, cutoff ) );
     } )
-  } );
-}
-
-var populateDBWithTestData = function() {
-  var commands = [
-   { "level": "intro", "player": "desktop", "commands": [ "mr", "md" ] },
-   { "level": "intro", "player": "desktop", "commands": [ "mr", "mr", "md" ] },
-   { "level": "square", "player": "desktop", "commands": [ "1", "0", "mr", "1", "0", "md" ] },
-   { "level": "short", "player": "desktop", "commands": [ "8", "mr" ] },
-   { "level": "long", "player": "desktop", "commands": [ "1", "0", "0", "mr" ] },
-  ];
-
-  db.collection( "commands", function( e, collection ) {
-    collection.insert( commands, { safe : true }, function( e, r ) {} );
   } );
 }
