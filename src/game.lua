@@ -311,6 +311,14 @@ function game:draw()
     end
   end
 
+  -- draw map grid helper overlay
+  -- draw vertical helpers
+  for y = 1, map.height do
+
+  end
+
+
+
   -- draw doodads
   if ( map.dest.x and map.dest.y ) then
     doodad.destanim:draw( ( map.dest.x - 1 ) * map.tilewidth, ( map.dest.y - 1 ) * map.tileheight )
