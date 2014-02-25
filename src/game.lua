@@ -338,12 +338,22 @@ function game:draw()
   end
 
   -- draw map grid helper overlay
-  -- draw vertical helpers
-  for y = 1, map.height do
 
+  -- vertical helpers
+  for y = 1, map.height do
+    love.graphics.setColor( 255, 255, 255, 255 )
+    love.graphics.setFont( fonts["button"] )
+    love.graphics.print( y - 1, -map.tilewidth / 4, ( y - 0.6 ) * map.tileheight )
+    love.graphics.print( y - 1,  map.tilewidth * ( map.width + 0.25 ), ( y - 0.6 ) * map.tileheight )
   end
 
-
+  -- horizontal helpers
+  for x = 1, map.width do
+    love.graphics.setColor( 255, 255, 255, 255 )
+    love.graphics.setFont( fonts["button"] )
+    love.graphics.print( x - 1, ( x - 0.6 ) * map.tilewidth, -map.tileheight / 2  )
+    love.graphics.print( x - 1, ( x - 0.6 ) * map.tilewidth,  map.tileheight * ( map.height + 0.25 ) )
+  end
 
   -- draw doodads
   if ( map.dest.x and map.dest.y ) then
