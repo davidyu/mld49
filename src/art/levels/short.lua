@@ -5,6 +5,8 @@ return {
   tileheight = 64,
   orientation = "orthogonal",
   properties = { 
+    ["hideborderindicators"] = "true",
+    ["indicatorxoffset"] = "-1",
   },
   tilesets = { 
     {
@@ -47,7 +49,7 @@ return {
       name = "doodads",
       properties = { 
       },
-      tiles = { false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,{id = 0,},false,false,false,false,false,false,{id = 1,},false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false, },
+      tiles = { false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,{id = 2,},{id = 2,},{id = 2,},{id = 2,},{id = 2,},{id = 2,},{id = 2,},{id = 2,},false,false,{id = 0,},false,false,false,false,false,false,{id = 1,},false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false, },
     },
   },
   objectgroups = { 

@@ -5,6 +5,7 @@ return {
   tileheight = 64,
   orientation = "orthogonal",
   properties = { 
+    ["hideborderindicators"] = "true",
   },
   tilesets = { 
     {

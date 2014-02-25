@@ -10,6 +10,16 @@ function utils.buildMap( path )
   map.height = mapdata.height
   map.tilewidth = mapdata.tilewidth
   map.tileheight = mapdata.tileheight
+
+  if mapdata.properties.hideborderindicators == nil then
+    map.hideborderindicators = false
+  elseif mapdata.properties.hideborderindicators == "true" then
+    map.hideborderindicators = true
+  else
+    map.hideborderindicators = false
+  end
+
+  map.indicatorxoffset = mapdata.properties.indicatorxoffset or 0
   map.tileset = love.graphics.newImage( mapdata.tilesets[1].image.source )
   for i, tilelayer in ipairs( mapdata.tilelayers ) do
     if tilelayer.name == 'base' then
@@ -25,6 +35,7 @@ function utils.buildMap( path )
     elseif tilelayer.name == 'doodads' then
       map.start = {}
       map.dest = {}
+      map.indicators = {}
       for j, tile in ipairs( tilelayer.tiles ) do
         if tile then
           local x = ( j - 1 ) % mapdata.width + 1
@@ -35,6 +46,10 @@ function utils.buildMap( path )
           elseif tile.id == 1 then -- dest
             map.dest.x = x
             map.dest.y = y
+          elseif tile.id == 2 then
+            map.indicators[j] = 'x'
+          elseif tile.id == 3 then
+            map.indicators[j] = 'y'
           end
         end
       end

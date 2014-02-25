@@ -329,30 +329,39 @@ function game:draw()
   -- draw map
   for y = 1, map.height do
     for x = 1, map.width do
-      if love.graphics.drawq ~= nil then
-        love.graphics.drawq( map.tileset, map.tiles[ ( y - 1 ) * map.width + x ], ( x - 1 ) * map.tilewidth, ( y - 1 ) * map.tileheight )
-      else
-        love.graphics.draw( map.tileset, map.tiles[ ( y - 1 ) * map.width + x ], ( x - 1 ) * map.tilewidth, ( y - 1 ) * map.tileheight )
-      end
+      love.graphics.draw( map.tileset, map.tiles[ ( y - 1 ) * map.width + x ], ( x - 1 ) * map.tilewidth, ( y - 1 ) * map.tileheight )
     end
   end
 
   -- draw map grid helper overlay
 
   -- vertical helpers
-  for y = 1, map.height do
-    love.graphics.setColor( 255, 255, 255, 255 )
-    love.graphics.setFont( fonts["button"] )
-    love.graphics.print( y - 1, -map.tilewidth / 4, ( y - 0.6 ) * map.tileheight )
-    love.graphics.print( y - 1,  map.tilewidth * ( map.width + 0.25 ), ( y - 0.6 ) * map.tileheight )
+  if not map.hideborderindicators then
+    for y = 1, map.height do
+      love.graphics.setColor( 255, 255, 255, 255 )
+      love.graphics.setFont( fonts["button"] )
+      love.graphics.print( y - 1, -map.tilewidth / 4, ( y - 0.6 ) * map.tileheight )
+      love.graphics.print( y - 1,  map.tilewidth * ( map.width + 0.25 ), ( y - 0.6 ) * map.tileheight )
+    end
   end
 
   -- horizontal helpers
-  for x = 1, map.width do
-    love.graphics.setColor( 255, 255, 255, 255 )
-    love.graphics.setFont( fonts["button"] )
-    love.graphics.print( x - 1, ( x - 0.6 ) * map.tilewidth, -map.tileheight / 2  )
-    love.graphics.print( x - 1, ( x - 0.6 ) * map.tilewidth,  map.tileheight * ( map.height + 0.25 ) )
+  if not map.hideborderindicators then
+    for x = 1, map.width do
+      love.graphics.setColor( 255, 255, 255, 255 )
+      love.graphics.setFont( fonts["button"] )
+      love.graphics.print( x - 1, ( x - 0.6 ) * map.tilewidth, -map.tileheight / 2  )
+      love.graphics.print( x - 1, ( x - 0.6 ) * map.tilewidth,  map.tileheight * ( map.height + 0.25 ) )
+    end
+  end
+
+  -- in-map helpers
+  for y = 1, map.height do
+    for x = 1, map.width do
+      if map.indicators[ ( y - 1 ) * map.width + x ] == 'x' then
+        love.graphics.print( x - 1 + map.indicatorxoffset, ( x - 0.6 ) * map.tilewidth, ( y - 0.5 ) * map.tileheight  )
+      end
+    end
   end
 
   -- draw doodads
