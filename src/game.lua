@@ -27,7 +27,8 @@ local function resetlevel()
   bot.x = map.start.x
   bot.y = map.start.y
 
-  camera:setbounds( 0, 0, map.tilewidth * map.width, map.tileheight * map.height )
+  local screenw, screenh = love.window.getDimensions()
+  camera:setbounds( 0, 0, map.tilewidth * map.width - screenw, map.tileheight * map.height - screenh )
 
   cmd.init()
 end
