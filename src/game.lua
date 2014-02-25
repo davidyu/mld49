@@ -103,7 +103,7 @@ local function gethighscores()
   end
   local response = {}
   local res, code, _ = socket.http.request ( {
-    url = "http://sonargame.cloudapp.net:7000/gethighscores/"..map.name:gsub( "art/levels/", "" );
+    url = "http://sonargame.cloudapp.net:7000/gethighscores/"..map.name:gsub( "art/levels/", "" ) .. "/1";
     sink = ltn12.sink.table( response );
     create = function()
         local req_sock = socket.tcp()
