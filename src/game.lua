@@ -6,6 +6,7 @@ local gui = require 'vendor/Quickie'
 local gamestate = require 'vendor/hump/gamestate'
 local json = require 'vendor/json'
 local fonts = {}
+local serverdisable = false
 
 -- gamestates
 local game = {}
@@ -70,31 +71,46 @@ local function toJSONArray( array )
 end
 
 local function submitcommands( commands )
+  if serverdisable then
+    return false, 0
+  end
   local request = [[player=]]..bot.name..[[&level=]]..map.name:gsub( "art/levels/", "" )..[[&commands=]]..toJSONArray( commands )
   local response = {}
   local res, code, _ = socket.http.request ( {
-    url = "http://168.62.40.105:7000/submitscore";
+    url = "http://sonargame.cloudapp.net:7000/submitscore";
     method = "POST";
     headers = { [ "Content-Type" ] = "application/x-www-form-urlencoded";
                 [ "Content-Length" ] = #request;
               };
     source = ltn12.source.string( request );
     sink = ltn12.sink.table( response );
+    create = function()
+        local req_sock = socket.tcp()
+        req_sock:settimeout( 200 )
+        return req_sock
+    end
   } )
 
   return res and true, table.remove( response ) or false, 0
 end
 
 local function gethighscores()
+  if serverdisable then
+    return nil
+  end
   local response = {}
   local res, code, _ = socket.http.request ( {
-    url = "http://168.62.40.105:7000/gethighscores/"..map.name:gsub( "art/levels/", "" );
+    url = "http://sonargame.cloudapp.net:7000/gethighscores/"..map.name:gsub( "art/levels/", "" );
     sink = ltn12.sink.table( response );
+    create = function()
+        local req_sock = socket.tcp()
+        req_sock:settimeout( 200 )
+        return req_sock
+    end
   } )
 
   -- debug
   -- table.foreach( response, print )
-
   return json:decode( table.concat( response ) )
 end
 
@@ -105,7 +121,11 @@ function game.stats:enter( from )
   if success then
     game.stats.percentile = tonumber( percentile )
     game.stats.highscores = gethighscores()
-    game.stats.topresult = game.stats.highscores[1]
+    if game.stats.highscores ~= nil then
+      game.stats.topresult = game.stats.highscores[1]
+    else
+      game.stats.topresult = nil
+    end
   else
     game.stats.percentile = nil
   end
@@ -120,22 +140,27 @@ function game.stats:update( dt )
   gui.group.push{ grow = "down", pos = { 250, 240 } }
 
   love.graphics.setFont( fonts["title"] )
-  local usedFewestCommands = ( table.maxn( game.stats.topresult["commands"] ) >= table.maxn( cmd.buffer ) )
-  if usedFewestCommands or game.stats.percentile and game.stats.percentile > 85 then
-    gui.Label{ text = "AWESOME!!!", align = "center" }
-  elseif game.stats.percentile and game.stats.percentile > 65 then
-    gui.Label{ text = "GREAT!!", align = "center" }
+
+  if game.stats.topresult ~= nil then
+    local usedFewestCommands = ( table.maxn( game.stats.topresult["commands"] ) >= table.maxn( cmd.buffer ) )
+    if usedFewestCommands or game.stats.percentile and game.stats.percentile > 85 then
+      gui.Label{ text = "AWESOME!!!", align = "center" }
+    elseif game.stats.percentile and game.stats.percentile > 65 then
+      gui.Label{ text = "GREAT!!", align = "center" }
+    else
+      gui.Label{ text = "PASS!", align = "center" }
+    end
+    love.graphics.setFont( fonts["button"] )
+    gui.Label{ text = "you used " .. table.maxn( cmd.buffer ) .. " commands in total.", align = "center" }
+
+    if game.stats.percentile then
+      if usedFewestCommands or game.stats.percentile > 85 then
+        gui.Label{ text = "the top player on this level used " .. table.maxn( game.stats.topresult["commands"] ) .. " commands in total.", align = "center" }
+      end
+      gui.Label{ text = bot.name .. "'s percentile rank on this level: " .. round( game.stats.percentile, 2 ), align = "center" }
+    end
   else
     gui.Label{ text = "PASS!", align = "center" }
-  end
-  love.graphics.setFont( fonts["button"] )
-  gui.Label{ text = "you used " .. table.maxn( cmd.buffer ) .. " commands in total.", align = "center" }
-
-  if game.stats.percentile then
-    if usedFewestCommands or game.stats.percentile > 85 then
-      gui.Label{ text = "the top player on this level used " .. table.maxn( game.stats.topresult["commands"] ) .. " commands in total.", align = "center" }
-    end
-    gui.Label{ text = bot.name .. "'s percentile rank on this level: " .. round( game.stats.percentile, 2 ), align = "center" }
   end
 
   gui.group.pop()
