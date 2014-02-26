@@ -7,6 +7,7 @@ local gamestate = require 'vendor/hump/gamestate'
 local json = require 'vendor/json'
 local fonts = {}
 local serverdisable = false
+local requestthreads = {}
 
 -- gamestates
 local game = {}
@@ -73,12 +74,22 @@ local function toJSONArray( array )
   return arr
 end
 
+local function receive( connection )
+  connection:settimeout( 0 )
+  local s, status, partial = connection:receive( 2 ^ 10 )
+  if status == "timeout" then
+    coroutine.yield( connection )
+  end
+  return s or partial, status
+end
+
 local function submitcommands( commands )
   if serverdisable then
     return false, 0
   end
   local request = [[player=]]..bot.name..[[&level=]]..map.name:gsub( "art/levels/", "" )..[[&commands=]]..toJSONArray( commands )
   local response = {}
+
   local res, code, _ = socket.http.request ( {
     url = "http://sonargame.cloudapp.net:7000/submitscore";
     method = "POST";
@@ -98,23 +109,42 @@ local function submitcommands( commands )
 end
 
 local function gethighscores()
-  if serverdisable then
-    return nil
-  end
-  local response = {}
-  local res, code, _ = socket.http.request ( {
-    url = "http://sonargame.cloudapp.net:7000/gethighscores/"..map.name:gsub( "art/levels/", "" ) .. "/1";
-    sink = ltn12.sink.table( response );
-    create = function()
-        local req_sock = socket.tcp()
-        req_sock:settimeout( 200 )
-        return req_sock
-    end
-  } )
+  game.stats.topresult = nil
+  if serverdisable then return end
 
-  -- debug
-  -- table.foreach( response, print )
-  return json:decode( table.concat( response ) )
+  local c = assert( socket.connect( "sonargame.cloudapp.net", 7000 ) )
+  local response, count = "", 0
+  c:send( "GET " .. "/gethighscores/" .. map.name:gsub( "art/levels/", "" ) .. "/1 HTTP/1.0\r\n\r\n" )
+  while true do
+    local s, status, partial = receive( c )
+    response = response .. ( s or partial )
+    count = count + #( s or partial )
+    if status == "closed" then break end
+  end
+  c:close()
+
+  local data = response:gsub( ".*\r\n\r\n", "", 1 ) -- strip headers
+  game.stats.topresult = json:decode( data )[1] -- parse data
+end
+
+-- kicks off a network request as a coroutine
+local function kickoff( request )
+  local co = coroutine.create( function()
+    request()
+  end )
+  table.insert( requestthreads, co )
+end
+
+-- runs coroutines in requestthreads
+local function dispatch()
+  local n = table.getn( requestthreads )
+  for i = 1,n do
+    if requestthreads[i] == nil then break end
+    local status, res = coroutine.resume( requestthreads[i] )
+    if not res then
+      table.remove( requestthreads, i )
+    end
+  end
 end
 
 function game.stats:enter( from )
@@ -123,12 +153,7 @@ function game.stats:enter( from )
   local success, percentile = submitcommands( cmd.buffer )
   if success then
     game.stats.percentile = tonumber( percentile )
-    game.stats.highscores = gethighscores()
-    if game.stats.highscores ~= nil then
-      game.stats.topresult = game.stats.highscores[1]
-    else
-      game.stats.topresult = nil
-    end
+    kickoff( gethighscores )
   else
     game.stats.percentile = nil
   end
@@ -140,6 +165,8 @@ local function round(num, idp)
 end
 
 function game.stats:update( dt )
+  dispatch() -- run submit & get server commands
+
   gui.group.push{ grow = "down", pos = { 250, 240 } }
 
   love.graphics.setFont( fonts["title"] )
