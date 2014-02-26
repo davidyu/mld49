@@ -83,38 +83,43 @@ local function receive( connection )
   return s or partial, status
 end
 
-local function submitcommands( commands )
-  if serverdisable then
-    return false, 0
-  end
-  local request = [[player=]]..bot.name..[[&level=]]..map.name:gsub( "art/levels/", "" )..[[&commands=]]..toJSONArray( commands )
-  local response = {}
-
-  local res, code, _ = socket.http.request ( {
-    url = "http://sonargame.cloudapp.net:7000/submitscore";
-    method = "POST";
-    headers = { [ "Content-Type" ] = "application/x-www-form-urlencoded";
-                [ "Content-Length" ] = #request;
-              };
-    source = ltn12.source.string( request );
-    sink = ltn12.sink.table( response );
-    create = function()
-        local req_sock = socket.tcp()
-        req_sock:settimeout( 200 )
-        return req_sock
-    end
-  } )
-
-  return res and true, table.remove( response ) or false, 0
-end
-
-local function gethighscores()
-  game.stats.topresult = nil
+local function submitcommands()
+  local commands = cmd.buffer
   if serverdisable then return end
 
   local c = assert( socket.connect( "sonargame.cloudapp.net", 7000 ) )
+
+  local request = [[player=]]..bot.name..[[&level=]]..map.name:gsub( "art/levels/", "" )..[[&commands=]]..toJSONArray( commands )
+
+  c:send( "POST /submitscore HTTP/1.1\r\n" )
+  c:send( "Host: sonargame.cloudapp.net\r\n" )
+  c:send( "Content-Type: application/x-www-form-urlencoded\r\n" )
+  c:send( "Content-Length: " .. #request .. "\r\n\r\n" )
+  c:send( request .. "\r\n" )
+
   local response, count = "", 0
-  c:send( "GET " .. "/gethighscores/" .. map.name:gsub( "art/levels/", "" ) .. "/1 HTTP/1.0\r\n\r\n" )
+
+  while true do
+    local s, status, partial = receive( c )
+    response = response .. ( s or partial )
+    count = count + #( s or partial )
+    local data = response:gsub( ".*\r\n\r\n", "", 1 ) -- strip headers
+    if #data > 1 then break end
+    if status == "closed" then break end
+  end
+  c:close()
+
+  local data = response:gsub( ".*\r\n\r\n", "", 1 ) -- strip headers
+  game.stats.percentile = tonumber( data )
+end
+
+local function gethighscores()
+  if serverdisable then return end
+
+  local c = assert( socket.connect( "sonargame.cloudapp.net", 7000 ) )
+  c:send( "GET /gethighscores/" .. map.name:gsub( "art/levels/", "" ) .. "/1 HTTP/1.0\r\n\r\n" )
+  local response, count = "", 0
+
   while true do
     local s, status, partial = receive( c )
     response = response .. ( s or partial )
@@ -150,13 +155,9 @@ end
 function game.stats:enter( from )
   game.stats.parent = from
 
-  local success, percentile = submitcommands( cmd.buffer )
-  if success then
-    game.stats.percentile = tonumber( percentile )
-    kickoff( gethighscores )
-  else
-    game.stats.percentile = nil
-  end
+  -- kick off web requests
+  kickoff( submitcommands )
+  kickoff( gethighscores )
 end
 
 -- thanks to http://lua-users.org/wiki/SimpleRound
@@ -165,13 +166,9 @@ local function round(num, idp)
 end
 
 function game.stats:update( dt )
-  dispatch() -- run submit & get server commands
-
   gui.group.push{ grow = "down", pos = { 250, 240 } }
-
   love.graphics.setFont( fonts["title"] )
-
-  if game.stats.topresult ~= nil then
+  if game.stats.topresult ~= nil and game.stats.percentile ~= nil then
     local usedFewestCommands = ( table.maxn( game.stats.topresult["commands"] ) >= table.maxn( cmd.buffer ) )
     if usedFewestCommands or game.stats.percentile and game.stats.percentile > 85 then
       gui.Label{ text = "AWESOME!!!", align = "center" }
@@ -191,6 +188,8 @@ function game.stats:update( dt )
     end
   else
     gui.Label{ text = "PASS!", align = "center" }
+    love.graphics.setFont( fonts["button"] )
+    gui.Label{ text = "fetching some data for you...please wait...", align = "center" }
   end
 
   gui.group.pop()
@@ -202,6 +201,8 @@ function game.stats:update( dt )
     resetlevel()
   end
   gui.group.pop()
+
+  dispatch() -- run submit & get server commands
 end
 
 function game.stats:keypressed( key, code )
@@ -305,9 +306,8 @@ function game:update( dt )
 
   -- check for win condition
   if won( bot, map ) then
-    -- play brief celebratory overlay
-    -- submit commands to server
-
+    game.stats.topresult = nil
+    game.stats.percentile = nil
     gamestate.push( game.stats )
   end
 end
