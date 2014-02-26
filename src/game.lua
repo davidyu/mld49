@@ -196,6 +196,10 @@ function game.stats:update( dt )
   gui.group.push{ grow = "down", pos = { 250, 400 } }
   love.graphics.setFont( fonts["button"] )
   if gui.Button{ text = "advance [spc]", align = "center" } then
+    -- just remove the coroutines; we don't need them anymore
+    while( table.getn( requestthreads > 1 ) ) do
+      table.remove( requestthreads )
+    end
     gamestate.pop() -- pop doesn't prevent code from executing
     nextlevel()
     resetlevel()
